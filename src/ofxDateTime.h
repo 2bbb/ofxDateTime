@@ -179,24 +179,10 @@ private:
 
 std::ostream &operator<<(std::ostream &os, const ofxDateTime &dt);
 
-int64_t operator ""_sec(unsigned long long sec) {
-    return sec;
-}
-
-int64_t operator ""_min(unsigned long long min) {
-    return 60 * min;
-}
-
-int64_t operator ""_hour(unsigned long long hour) {
-    return 60 * 60 * hour;
-}
-
-int64_t operator ""_day(unsigned long long day) {
-    return 24 * 60 * 60 * day;
-}
-
-int64_t operator ""_week(unsigned long long week) {
-    return 7 * 24 * 60 * 60 * week;
-}
+int64_t operator ""_sec(unsigned long long sec);
+int64_t operator ""_min(unsigned long long min);
+int64_t operator ""_hour(unsigned long long hour);
+int64_t operator ""_day(unsigned long long day);
+int64_t operator ""_week(unsigned long long week);
 
 #endif /* ofxDateTime_h */
