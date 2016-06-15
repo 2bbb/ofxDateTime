@@ -119,7 +119,7 @@ bool ofxDateTime::operator>=(const ofxDateTime &dt) const { return *body >= *(dt
 
 #pragma mark cast
 
-std::string ofxDateTime::getFormattedString(std::string format) const {
+std::string ofxDateTime::getFormattedString(const std::string &format) const {
     return Poco::DateTimeFormatter::format(getDateTime(), format, static_cast<int>(3600 * timezone_diff_in_hour));
 }
 
@@ -151,7 +151,7 @@ ofxDateTime &ofxDateTime::operator-=(int64_t diff) {
 
 #pragma mark getter / setter
 
-int ofxDateTime::year() const { return getDateTime().year(); }
+uint32_t ofxDateTime::year() const { return getDateTime().year(); }
 uint8_t ofxDateTime::month() const { return getDateTime().month(); }
 uint8_t ofxDateTime::day() const { return getDateTime().day(); }
 uint8_t ofxDateTime::hour() const { return getDateTime().hour(); }

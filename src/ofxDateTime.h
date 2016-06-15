@@ -69,12 +69,6 @@ struct ofxDateTime {
     ofxDateTime &set(uint64_t unix_time);
     ofxDateTime &set(uint64_t unix_time, float timezone_diff_hour);
     
-    inline ofxDateTime &setTimezone(float timezone_diff_hour) {
-        formatted.reset();
-        timezone_diff_in_hour = timezone_diff_hour;
-        return *this;
-    }
-    
     ofxDateTime &operator=(const ofxDateTime &datetime);
     ofxDateTime &operator=(ofxDateTime &&datetime);
     ofxDateTime &operator=(uint64_t unix_time);
@@ -103,7 +97,7 @@ struct ofxDateTime {
     inline std::string getRFCFormatString() const {
         return getFormattedString("%w, %d %b %Y %H:%M:%S %Z");
     }
-    std::string getFormattedString(std::string format) const;
+    std::string getFormattedString(const std::string &format) const;
     
     // returns unix timestamp
     operator uint64_t() const;
@@ -120,42 +114,50 @@ struct ofxDateTime {
     inline int64_t operator-(const ofxDateTime &from_date) const { return (operator uint64_t() - from_date.operator uint64_t()); }
     inline int64_t timeIntervalSince(const ofxDateTime &from_date) const { return *this - from_date; }
     
-    int year() const;
+    uint32_t year() const;
+    inline uint32_t Y() const { return year(); }
     uint8_t month() const;
+    inline uint8_t M() const { return month(); }
     uint8_t day() const;
+    inline uint8_t D() const { return day(); }
     uint8_t hour() const;
+    inline uint8_t h() const { return hour(); }
     uint8_t minute() const;
+    inline uint8_t m() const { return minute(); }
     uint8_t second() const;
+    inline uint8_t s() const { return second(); }
     uint16_t millisecond() const;
+    inline uint16_t ms() const { return millisecond(); }
     uint16_t microsecond() const;
+    inline uint16_t us() const { return microsecond(); }
     
-    inline float getTimezoneDifference() const { return timezone_diff_in_hour; }
+    inline float timezoneDifference() const { return timezone_diff_in_hour; }
+    inline float tzd() const { return timezone_diff_in_hour; }
     
-    inline ofxDateTime &year(int y) {
-        return set(y, month(), day(), hour(), minute(), second(), millisecond(), microsecond());
-    }
-    inline ofxDateTime &month(int m) {
-        return set(year(), m, day(), hour(), minute(), second(), millisecond(), microsecond());
-    }
-    inline ofxDateTime &day(int d) {
-        return set(year(), month(), d, hour(), minute(), second(), millisecond(), microsecond());
-    }
-    inline ofxDateTime &hour(int h) {
-        return set(year(), month(), day(), h, minute(), second(), millisecond(), microsecond());
-    }
-    inline ofxDateTime &minute(int m) {
-        return set(year(), month(), day(), hour(), m, second(), millisecond(), microsecond());
-    }
-    inline ofxDateTime &second(int s) {
-        return set(year(), month(), day(), hour(), minute(), s, millisecond(), microsecond());
-    }
-    inline ofxDateTime &millisecond(uint16_t msec) {
-        return set(year(), month(), day(), hour(), minute(), second(), msec, microsecond());
-    }
-    inline ofxDateTime &microsecond(uint16_t usec) {
-        return set(year(), month(), day(), hour(), minute(), second(), millisecond(), usec);
-    }
+    inline ofxDateTime &Y(int year) { return set(year, M(), D(), h(), m(), s(), ms(), us()); }
+    inline ofxDateTime &year(int year) { return Y(year); }
+    inline ofxDateTime &M(int month) { return set(Y(), month, D(), h(), m(), s(), ms(), us()); }
+    inline ofxDateTime &month(int month) { return M(month); }
+    inline ofxDateTime &D(int day) { return set(Y(), M(), day, h(), m(), s(), ms(), us()); }
+    inline ofxDateTime &day(int day) { return D(day); }
+    inline ofxDateTime &h(int hour) { return set(Y(), M(), D(), hour, m(), s(), ms(), us()); }
+    inline ofxDateTime &hour(int hour) { return h(hour); }
+    inline ofxDateTime &m(int min) { return set(Y(), M(), D(), h(), min, s(), ms(), us()); }
+    inline ofxDateTime &minute(int min) { return m(min); }
+    inline ofxDateTime &s(int sec) { return set(Y(), M(), D(), h(), m(), sec, ms(), us()); }
+    inline ofxDateTime &second(int sec) { return s(sec); }
+    inline ofxDateTime &ms(uint16_t ms_) { return set(Y(), M(), D(), h(), m(), s(), ms_, us()); }
+    inline ofxDateTime &millisecond(uint16_t ms_) { ms(ms_); }
+    inline ofxDateTime &us(uint16_t us_) { return set(Y(), M(), D(), h(), m(), s(), ms(), us_); }
+    inline ofxDateTime &microsecond(uint16_t us_) { return us(us_); }
     
+    inline ofxDateTime &timezoneDifference(float timezone_diff_hour) {
+        formatted.reset();
+        timezone_diff_in_hour = timezone_diff_hour;
+        return *this;
+    }
+    inline ofxDateTime &tzd(float timezone_diff_hour) { return timezoneDifference(timezone_diff_hour); }
+
     ofxDateTime &setToNow();
     
     inline ofxDateTime yesterday() const { return this->operator-(24 * 60 * 60); }
