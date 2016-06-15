@@ -181,10 +181,42 @@ private:
 
 std::ostream &operator<<(std::ostream &os, const ofxDateTime &dt);
 
-int64_t operator ""_sec(unsigned long long sec);
-int64_t operator ""_min(unsigned long long min);
-int64_t operator ""_hour(unsigned long long hour);
-int64_t operator ""_day(unsigned long long day);
-int64_t operator ""_week(unsigned long long week);
+namespace detail {
+    constexpr uint64_t pow(uint64_t base, int exp) {
+        return (exp > 0) ? base * pow(base, exp - 1) : 1;
+    };
+    
+    template <char ...>
+    struct literal;
+    
+    template <> struct literal<> {
+        static constexpr uint64_t to_int = 0;
+    };
+    template <char c, char ...cv>
+    struct literal<c, cv...> {
+        static constexpr uint64_t to_int = (c - '0') * pow(10, sizeof...(cv)) + literal<cv...>::to_int;
+    };
+};
+
+template<char ... chars>
+constexpr int64_t operator "" _sec() {
+    return detail::literal<chars ...>::to_int;
+}
+template<char ... chars>
+constexpr int64_t operator "" _min() {
+    return 60 * detail::literal<chars ...>::to_int;
+}
+template<char ... chars>
+constexpr int64_t operator "" _hour() {
+    return 60 * 60 * detail::literal<chars ...>::to_int;
+}
+template<char ... chars>
+constexpr int64_t operator ""_day() {
+    return 24 * 60 * 60 * detail::literal<chars ...>::to_int;
+}
+template<char ... chars>
+constexpr int64_t operator ""_week() {
+    return 7 * 24 * 60 * 60 * detail::literal<chars ...>::to_int;
+}
 
 #endif /* ofxDateTime_h */
