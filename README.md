@@ -4,7 +4,7 @@ utility for datetime and unix time
 
 ## How to use
 
-```
+```cpp
 	ofxDateTime jst = ofxDateTime({2016, 6, 6}, 9); // 2016/06/06 00:00:00 +09:00
 	ofxDateTime utc = ofxDateTime({2016, 6, 6}, 0); // 2016/06/06 00:00:00 +00:00
 	ofxDateTime ytz = ofxDateTime({2016, 6, 6}); // 2016/06/06 00:00:00 + your timezone diff
