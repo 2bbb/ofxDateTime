@@ -69,6 +69,12 @@ struct ofxDateTime {
     ofxDateTime &set(uint64_t unix_time);
     ofxDateTime &set(uint64_t unix_time, float timezone_diff_hour);
     
+    inline ofxDateTime &setTimezone(float timezone_diff_hour) {
+        formatted.reset();
+        timezone_diff_in_hour = timezone_diff_hour;
+        return *this;
+    }
+    
     ofxDateTime &operator=(const ofxDateTime &datetime);
     ofxDateTime &operator=(ofxDateTime &&datetime);
     ofxDateTime &operator=(uint64_t unix_time);
@@ -150,7 +156,7 @@ struct ofxDateTime {
         return set(year(), month(), day(), hour(), minute(), second(), millisecond(), usec);
     }
     
-    ofxDateTime &updateToNow();
+    ofxDateTime &setToNow();
     
     inline ofxDateTime yesterday() const { return this->operator-(24 * 60 * 60); }
     inline ofxDateTime &goPrevDay() { return this->operator-=(24 * 60 * 60); }

@@ -21,6 +21,7 @@
 
 ofxDateTime::ofxDateTime()
 : body(new Poco::Timestamp())
+, formatted()
 , timezone_diff_in_hour(0.0f) {}
 
 ofxDateTime::ofxDateTime(const DateTimeStruct &dt)
@@ -28,6 +29,7 @@ ofxDateTime::ofxDateTime(const DateTimeStruct &dt)
 
 ofxDateTime::ofxDateTime(const DateTimeStruct &dt, float timezone_diff_hour)
 : body(new Poco::Timestamp())
+, formatted()
 , timezone_diff_in_hour(timezone_diff_hour) {
     Poco::DateTime date(dt.year, dt.month, dt.day,
                         dt.hour, dt.minute, dt.second,
@@ -42,6 +44,7 @@ ofxDateTime::ofxDateTime(uint64_t unix_time)
 
 ofxDateTime::ofxDateTime(uint64_t unix_time, float tzd)
 : body(new Poco::Timestamp(Poco::Timestamp::fromEpochTime(unix_time)))
+, formatted()
 , timezone_diff_in_hour(tzd) {}
 
 ofxDateTime::ofxDateTime(const ofxDateTime &datetime)
@@ -49,6 +52,7 @@ ofxDateTime::ofxDateTime(const ofxDateTime &datetime)
 
 ofxDateTime::ofxDateTime(const ofxDateTime &datetime, float timezone_diff_hour)
 : body(new Poco::Timestamp(*(datetime.body)))
+, formatted()
 , timezone_diff_in_hour(datetime.timezone_diff_in_hour) {}
 
 ofxDateTime::ofxDateTime(ofxDateTime &&datetime)
@@ -56,70 +60,52 @@ ofxDateTime::ofxDateTime(ofxDateTime &&datetime)
 
 ofxDateTime::ofxDateTime(ofxDateTime &&datetime, float timezone_diff_hour)
 : body(std::move(datetime.body))
-, timezone_diff_in_hour(timezone_diff_in_hour) {
-    datetime.body.reset();
-    datetime.formatted.reset();
-}
+, formatted()
+, timezone_diff_in_hour(timezone_diff_in_hour) {}
 
 #pragma mark set
 
 ofxDateTime &ofxDateTime::set(const DateTimeStruct &dt) {
-    body = std::move(ofxDateTime(dt).body);
-    formatted.reset();
-    return *this;
+    return *this = std::move(ofxDateTime(dt, timezone_diff_in_hour));
 }
 
 ofxDateTime &ofxDateTime::set(const DateTimeStruct &dt, float timezone_diff_hour) {
-    body = std::move(ofxDateTime(dt, timezone_diff_hour).body);
-    formatted.reset();
-    return *this;
+    return *this = std::move(ofxDateTime(dt, timezone_diff_hour));
 }
 
 ofxDateTime &ofxDateTime::set(int year, int month, int day,
                               int hour, int minute, int second,
                               int millisecond, int microsecond)
 {
-    body = std::move(ofxDateTime({
+    return *this = std::move(ofxDateTime({
         year, month, day,
         hour, minute, second,
         millisecond, microsecond
-    }).body);
-    formatted.reset();
-    return *this;
+    }, timezone_diff_in_hour));
 }
 
 ofxDateTime &ofxDateTime::set(uint64_t unix_time) {
-    return set(unix_time, Poco::Timezone::tzd() / 3600.0f);
+    return *this = std::move(ofxDateTime(unix_time, timezone_diff_in_hour));
 }
 
 ofxDateTime &ofxDateTime::set(uint64_t unix_time, float tzd) {
-    body = std::make_shared<Poco::Timestamp>(Poco::Timestamp::fromEpochTime(unix_time));
-    timezone_diff_in_hour = tzd;
-    formatted.reset();
-    return *this;
+    return *this = std::move(ofxDateTime(unix_time, tzd));
 }
 
 ofxDateTime &ofxDateTime::operator=(const ofxDateTime &datetime) {
-    body = std::make_shared<Poco::Timestamp>(*(datetime.body));
-    if(datetime.formatted) formatted = std::make_shared<Poco::DateTime>(*(datetime.formatted));
-    timezone_diff_in_hour = datetime.timezone_diff_in_hour;
-    return *this;
+    return *this = std::move(ofxDateTime(datetime));
 }
 
 ofxDateTime &ofxDateTime::operator=(ofxDateTime &&datetime) {
     body = std::move(datetime.body);
-    if(datetime.formatted) formatted = std::move(datetime.formatted);
+    formatted.reset();
     timezone_diff_in_hour = datetime.timezone_diff_in_hour;
-    
-    datetime.body.reset();
-    datetime.formatted.reset();
     
     return *this;
 }
 
 ofxDateTime &ofxDateTime::operator=(uint64_t unix_time) {
-    set(unix_time);
-    return *this;
+    return set(unix_time);
 }
 
 #pragma mark comparator
@@ -174,7 +160,7 @@ uint8_t ofxDateTime::second() const { return getDateTime().second(); }
 uint16_t ofxDateTime::millisecond() const { return getDateTime().millisecond(); }
 uint16_t ofxDateTime::microsecond() const { return getDateTime().microsecond(); }
 
-ofxDateTime &ofxDateTime::updateToNow() {
+ofxDateTime &ofxDateTime::setToNow() {
     body->update();
     return *this;
 }
