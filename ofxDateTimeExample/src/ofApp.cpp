@@ -5,16 +5,31 @@
 class ofApp : public ofBaseApp {
 public:
     void setup() {
+        // default value is now
+        ofxDateTime datetime;
+        ofLogNotice("default") << datetime;
+        
+        std::cout << std::endl;
+        
         // create from year, month, day with your timezone
         ofxDateTime def = ofxDateTime({2016, 6, 15});
-        ofLogNotice("default") << def;
-        
+        ofLogNotice("default timezone") << def;
         // create from year, month, day with specified timezone
         ofxDateTime utc = ofxDateTime({2016, 6, 15}, 0);
         ofLogNotice("UTC") << utc;
         ofxDateTime jst = ofxDateTime({2016, 6, 15}, 9);
         ofLogNotice("JST") << jst;
         
+        std::cout << std::endl;
+
+        // create from timestamp
+        ofLogNotice("UTC timestamp to UTC") << ofxDateTime(utc.getUnixTime(), 0);
+        ofLogNotice("UTC timestamp to JST") << ofxDateTime(utc.getUnixTime(), 9);
+        ofLogNotice("JST timestamp to UTC") << ofxDateTime(jst.getUnixTime(), 0);
+        ofLogNotice("JST timestamp to JST") << ofxDateTime(jst.getUnixTime(), 9);
+        
+        std::cout << std::endl;
+
         // can get unix timestamp
         ofLogNotice("UTC timestamp") << utc.getUnixTime();
         ofLogNotice("JST timestamp") << jst.getUnixTime();
@@ -22,20 +37,14 @@ public:
         ofLogNotice("difference between utc and jst") << utc - jst;
         assert(utc - jst == 9 * 60 * 60);
         
-        // create from timestamp
-        ofLogNotice("UTC timestamp to UTC") << ofxDateTime(utc.getUnixTime(), 0);
-        ofLogNotice("UTC timestamp to JST") << ofxDateTime(utc.getUnixTime(), 9);
-        ofLogNotice("JST timestamp to UTC") << ofxDateTime(jst.getUnixTime(), 0);
-        ofLogNotice("JST timestamp to JST") << ofxDateTime(jst.getUnixTime(), 9);
+        std::cout << std::endl;
         
         // set specified component
-        ofLogNotice("setter") << utc.year(2001);
+        ofLogNotice("setter") << datetime.year(2001);
         // and can method chain
-        ofLogNotice("setter") << utc.month(2).day(3).hour(4).minute(5).second(6).millisecond(7).microsecond(8);
-        
-        // default value is now
-        ofxDateTime datetime;
-        ofLogNotice("default") << datetime;
+        ofLogNotice("setter") << datetime.month(2).day(3).hour(4).minute(5).second(6).millisecond(7).microsecond(8);
+        // or short name
+        ofLogNotice("setter") << datetime.Y(1999).M(12).D(31).h(23).m(59).s(59).ms(999).us(999);
         
         // `set` keeps timezone
         ofLogNotice("set") << datetime.set({2011, 12, 13, 14, 15, 16, 17});
@@ -45,7 +54,7 @@ public:
         ofLogNotice("set") << datetime.set({2011, 12, 13, 14, 15, 16, 17}, 8.5);
         
         // change timezone
-        datetime.setTimezone(7);
+        datetime.timezoneDifference(7);
         ofLogNotice("setTimezone") << datetime;
         
         // get next day
@@ -72,6 +81,7 @@ public:
         uint64_t ts = datetime;
         assert(ts == datetime.getUnixTime());
         
+        // user defined literal
         datetime.set(2000, 1, 1, 0, 0, 0);
         ofLogNotice("custom literal") << (datetime + 4_day + 4_hour + 4_min + 4_sec);
     }
