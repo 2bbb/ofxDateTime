@@ -22,7 +22,11 @@ utility for datetime and unix time
 
 ## API
 
-TODO
+* `getFormattedString(const std::string &format)`
+
+[see this](http://pocoproject.org/docs/Poco.DateTimeFormatter.html#9475)
+
+*TODO*
 
 ## Update History
 
